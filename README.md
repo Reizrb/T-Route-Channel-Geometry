@@ -14,10 +14,9 @@ RouteLink file that T-Route can use directly.
 ## Requirements
 
 - Python 3.10 or later
-- The original NWM v3.0 RouteLink file (`RouteLink_CONUS.nc`). It is never modified;
-  a new file is written.
-- Internet access to get the channel geometry from the HydroGeom API, or the full CONUS
-  geometry dataset from [Zenodo](https://doi.org/10.5281/zenodo.19208847)
+- Internet access: the original NWM RouteLink file (`RouteLink_CONUS.nc`, several hundred
+  MB) is downloaded from NOAA, and the channel geometry from the HydroGeom API (or use the
+  full CONUS geometry dataset from [Zenodo](https://doi.org/10.5281/zenodo.19208847))
 
 ## Install
 
@@ -35,14 +34,15 @@ jupyter notebook examples/TRoute_geometry_HUC2-11_a0.4.ipynb
 
 The notebook updates the reaches of the **Arkansas-White-Red region (HUC2 11)** with a
 trapezoidal channel of **a = 0.4**, writes the new RouteLink file, compares original and
-updated values, and shows how to point T-Route to the new file. Set `routelink_in` in
-STEP 2 to the location of your RouteLink file.
+updated values, and shows how to point T-Route to the new file. The original RouteLink
+file is downloaded from NOAA automatically.
 
 ## Use it
 
 ```python
 import troute_geometry as tg
 
+tg.download_routelink("RouteLink_CONUS.nc")                  # original NWM file from NOAA
 geometry = tg.channel_geometry(huc2="11")                    # or state="AR", huc8=..., comids=[...]
 # geometry = tg.read_geometry_file("Bankfull_Meanflow_CONUS_Stream_Reaches.txt")   # all of CONUS
 
@@ -63,10 +63,20 @@ network_topology_parameters:
 
 | Function in `troute_geometry.py` | What it does |
 |----------------------------------|--------------|
+| `download_routelink(dest, url=None)` | Download the original CONUS RouteLink file from NOAA (skipped if it exists) |
 | `channel_geometry(huc2=, state=, huc8=, comids=)` | Bankfull width and depth for an area from HydroGeom |
 | `read_geometry_file(path)` | Bankfull width and depth from the full CONUS dataset file |
 | `update_routelink(routelink_in, routelink_out, geometry, a)` | Write a new RouteLink file with the updated geometry |
 | `compare(routelink_in, routelink_out, comids=None)` | Original vs updated values of the geometry and Muskingum variables |
+
+## The original RouteLink file
+
+`download_routelink()` gets `RouteLink_CONUS.nc` from NOAA's NWM production server
+(`https://www.nco.ncep.noaa.gov/pmb/codes/nwprod/`), from the **current** operational NWM
+release (for example `nwm.v3.1.6`). NOAA keeps only the current release there, so the
+version is looked up each time, and the file can change when NWM is updated. To use a
+specific file, pass its URL (`url=...`) or download it yourself and set its path. The
+original file is never modified.
 
 ## What it changes
 

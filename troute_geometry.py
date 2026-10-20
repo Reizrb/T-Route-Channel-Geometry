@@ -24,12 +24,56 @@ Requires numpy, pandas, netCDF4, and (for channel_geometry) HydroGeomKit:
 
 import datetime
 import os
+import re
 import shutil
+import urllib.request
 
 import numpy as np
 import pandas as pd
 
 GEOMETRY_VARS = ("BtmWdth", "TopWdth", "ChSlp", "TopWdthCC", "MusK", "MusX")
+NOAA_NWPROD = "https://www.nco.ncep.noaa.gov/pmb/codes/nwprod/"
+
+
+# --------------------------------------------------------- RouteLink download
+def _get(url):
+    req = urllib.request.Request(url, headers={"User-Agent": "TRoute-Channel-Geometry"})
+    return urllib.request.urlopen(req, timeout=60)
+
+
+def routelink_url():
+    """URL of RouteLink_CONUS.nc in the current operational NWM release on NOAA's server.
+
+    NOAA keeps only the current NWM version (e.g. nwm.v3.1.6), so the version is
+    looked up each time instead of being fixed.
+    """
+    with _get(NOAA_NWPROD) as r:
+        html = r.read().decode("utf-8", "ignore")
+    versions = sorted(
+        set(re.findall(r'href="[^"]*?(nwm\.v(\d+(?:\.\d+)*))/"', html)),
+        key=lambda v: tuple(int(x) for x in v[1].split(".")),
+    )
+    if not versions:
+        raise RuntimeError(f"No NWM release found at {NOAA_NWPROD}")
+    return f"{NOAA_NWPROD}{versions[-1][0]}/parm/domain/RouteLink_CONUS.nc"
+
+
+def download_routelink(dest="RouteLink_CONUS.nc", url=None):
+    """Download the NWM CONUS RouteLink file from NOAA (skipped if dest already exists).
+
+    url: a specific file to download; by default, the one in the current NWM release.
+    Returns the path of the file.
+    """
+    if os.path.exists(dest):
+        print(f"Using existing {dest}")
+        return dest
+    url = url or routelink_url()
+    tmp = dest + ".part"
+    with _get(url) as r, open(tmp, "wb") as f:
+        shutil.copyfileobj(r, f, length=1 << 20)
+    os.replace(tmp, dest)
+    print(f"Downloaded {dest} ({os.path.getsize(dest) / 1e6:,.0f} MB) from {url}")
+    return dest
 
 
 # ----------------------------------------------------------------- geometry
