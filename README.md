@@ -1,0 +1,107 @@
+# T-Route Channel Geometry
+
+Python code to update the channel geometry that
+[T-Route](https://github.com/NOAA-OWP/t-route), the routing model of the National Water
+Model (NWM), uses for every river reach.
+
+T-Route's Muskingum-Cunge routing treats each reach as a trapezoidal channel, defined in
+the NWM **RouteLink** file by its bottom width, top width, and side slope. This code
+replaces that geometry with machine-learning predictions of bankfull width and depth from
+[HydroGeom](https://github.com/Reizrb/HydroGeom) (Zarrabi et al., 2025), for a channel
+shape you choose, and recomputes the Muskingum routing parameters. The result is a new
+RouteLink file that T-Route can use directly.
+
+## Requirements
+
+- Python 3.10 or later
+- The original NWM v3.0 RouteLink file (`RouteLink_CONUS.nc`). It is never modified;
+  a new file is written.
+- Internet access to get the channel geometry from the HydroGeom API, or the full CONUS
+  geometry dataset from [Zenodo](https://doi.org/10.5281/zenodo.19208847)
+
+## Install
+
+```bash
+git clone https://github.com/Reizrb/TRoute-Channel-Geometry
+cd TRoute-Channel-Geometry
+pip install numpy pandas netCDF4 "git+https://github.com/Reizrb/HydroGeom" jupyter
+```
+
+## Run the example
+
+```bash
+jupyter notebook examples/TRoute_geometry_HUC2-11_a0.4.ipynb
+```
+
+The notebook updates the reaches of the **Arkansas-White-Red region (HUC2 11)** with a
+trapezoidal channel of **a = 0.4**, writes the new RouteLink file, compares original and
+updated values, and shows how to point T-Route to the new file. Set `routelink_in` in
+STEP 2 to the location of your RouteLink file.
+
+## Use it
+
+```python
+import troute_geometry as tg
+
+geometry = tg.channel_geometry(huc2="11")                    # or state="AR", huc8=..., comids=[...]
+# geometry = tg.read_geometry_file("Bankfull_Meanflow_CONUS_Stream_Reaches.txt")   # all of CONUS
+
+tg.update_routelink("RouteLink_CONUS.nc", "RouteLink_CONUS_a0.4.nc", geometry, a=0.4)
+```
+
+Then set the new file in the T-Route configuration YAML:
+
+```yaml
+network_topology_parameters:
+  supernetwork_parameters:
+    geo_file_path: RouteLink_CONUS_a0.4.nc
+```
+
+| Setting | Meaning |
+|---------|---------|
+| `a` | Bottom width / top width of the trapezoid: `0` triangle, between 0 and 1 trapezoid, `0.99` nearly rectangular |
+
+| Function in `troute_geometry.py` | What it does |
+|----------------------------------|--------------|
+| `channel_geometry(huc2=, state=, huc8=, comids=)` | Bankfull width and depth for an area from HydroGeom |
+| `read_geometry_file(path)` | Bankfull width and depth from the full CONUS dataset file |
+| `update_routelink(routelink_in, routelink_out, geometry, a)` | Write a new RouteLink file with the updated geometry |
+| `compare(routelink_in, routelink_out, comids=None)` | Original vs updated values of the geometry and Muskingum variables |
+
+## What it changes
+
+For each reach with bankfull top width B and depth d, and bottom/top width ratio a:
+
+| RouteLink variable | New value |
+|--------------------|-----------|
+| `TopWdth` | B |
+| `BtmWdth` | a × B |
+| `ChSlp` | 1 / m, where m = (1 − a) B / (2d) is the H:V side slope (T-Route stores V:H) |
+| `TopWdthCC` | 3 × B |
+| `MusK` | Δx / c<sub>k</sub>, the travel time through the reach (s) |
+| `MusX` | 0.5 × [1 − Q / (c<sub>k</sub> B S<sub>0</sub> Δx)], clipped to 0–0.5 |
+
+Q is the bankfull discharge from Manning's equation and c<sub>k</sub> = dQ/dA the kinematic
+wave speed, both for the trapezoid at bankfull depth, with the reach's Manning's n, slope
+S<sub>0</sub>, and length Δx from the RouteLink file. All other RouteLink variables are
+unchanged.
+
+Notes:
+
+- `MusK`, `MusX`, and `TopWdthCC` are recomputed for **every** reach in the file, including
+  reaches that keep their original geometry, so all reaches use the same formulas.
+- `a = 1` (exactly rectangular) is not allowed: it gives a zero side slope that the T-Route
+  Muskingum-Cunge kernel cannot represent. Use `a = 0.99` instead.
+- `a = 0` (triangular) gives a zero bottom width; check routing stability on a few reaches.
+- Reaches without a geometry prediction keep their original geometry.
+
+## Citation
+
+- Zarrabi, R., McDermott, R., Erfani, S. M. H., & Cohen, S. (2025). Bankfull and
+  mean-flow channel geometry estimation through machine learning algorithms across
+  the CONtiguous United States (CONUS). *Water Resources Research*, 61(2).
+  https://doi.org/10.1029/2024WR037997
+
+## License
+
+[MIT](LICENSE)
