@@ -114,6 +114,13 @@ Notes:
   the CONtiguous United States (CONUS). *Water Resources Research*, 61(2).
   https://doi.org/10.1029/2024WR037997
 
+## Funding
+
+<table><tr>
+<td width="110"><img src="assets/ciroh_logo.png" alt="CIROH logo" width="100"></td>
+<td>Funding for this project was provided by the National Oceanic &amp; Atmospheric Administration (NOAA), awarded to the Cooperative Institute for Research to Operations in Hydrology (CIROH) through the Cooperative Agreement with The University of Alabama (NA22NWS4320003).</td>
+</tr></table>
+
 ## License
 
 [MIT](LICENSE)
