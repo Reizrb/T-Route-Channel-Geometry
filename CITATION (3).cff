@@ -1,0 +1,60 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "T-Route Channel Geometry: Updating National Water Model RouteLink Channel Geometry with Machine-Learning Bankfull Estimates"
+abstract: >-
+  Python code that replaces the trapezoidal channel geometry in the National Water
+  Model (NWM) RouteLink file with machine-learning predictions of bankfull width and
+  depth from HydroGeom, for a user-selected channel shape, and recomputes the
+  Muskingum routing parameters. The output is a RouteLink file that T-Route, the NWM
+  routing model, can use directly.
+authors:
+  - family-names: Zarrabi
+    given-names: Reihaneh
+    affiliation: "The University of Alabama"
+    email: rzarrabi@crimson.ua.edu
+    # orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"
+version: 1.0.1
+date-released: 2026-10-21
+doi: 10.5281/zenodo.23520058
+license: MIT
+repository-code: "https://github.com/Reizrb/T-Route-Channel-Geometry"
+keywords:
+  - National Water Model
+  - T-Route
+  - RouteLink
+  - channel geometry
+  - Muskingum-Cunge routing
+  - bankfull width and depth
+  - machine learning
+  - hydrology
+references:
+  - type: article
+    title: "Bankfull and mean-flow channel geometry estimation through machine learning algorithms across the CONtiguous United States (CONUS)"
+    authors:
+      - family-names: Zarrabi
+        given-names: Reihaneh
+      - family-names: McDermott
+        given-names: R.
+      - family-names: Erfani
+        given-names: S. M. H.
+      - family-names: Cohen
+        given-names: Sagy
+    journal: "Water Resources Research"
+    volume: 61
+    issue: 2
+    year: 2025
+    doi: 10.1029/2024WR037997
+  - type: data
+    title: "Updated NWM RouteLink files for six channel shapes across CONUS"
+    authors:
+      - family-names: Zarrabi
+        given-names: Reihaneh
+    doi: 10.5281/zenodo.23520462
+  - type: software
+    title: "HydroGeom: A Web Application, API, and Python Package for Retrieving Hydraulic Geometry across CONUS"
+    authors:
+      - family-names: Zarrabi
+        given-names: Reihaneh
+    doi: 10.5281/zenodo.23520185
+    repository-code: "https://github.com/Reizrb/HydroGeom"
