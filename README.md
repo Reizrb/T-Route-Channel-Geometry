@@ -71,6 +71,10 @@ network_topology_parameters:
 | `update_routelink(routelink_in, routelink_out, geometry, a)` | Write a new RouteLink file with the updated geometry |
 | `compare(routelink_in, routelink_out, comids=None)` | Original vs updated values of the geometry and Muskingum variables |
 
+## Ready-made RouteLink files
+
+Updated RouteLink files for six channel shapes across CONUS (a = 0, 0.2, 0.4, 0.6, 0.8, and 0.99), made with this code, are on Zenodo: https://doi.org/10.5281/zenodo.23520462
+
 ## The original RouteLink file
 
 `download_routelink()` gets `RouteLink_CONUS.nc` from NOAA's NWM production server
@@ -124,3 +128,13 @@ Notes:
 ## License
 
 [MIT](LICENSE)
+
+## Related repositories
+
+| Repository | What it does |
+|------------|--------------|
+| [Bankfull-and-mean-flow-channel-geometry-for-CONUS](https://github.com/Reizrb/Bankfull-and-mean-flow-channel-geometry-for-CONUS) | ML models and the CONUS bankfull and mean-flow channel geometry dataset |
+| [HydroGeom](https://github.com/Reizrb/HydroGeom) | Web page, API, and Python package to get and use the channel geometry |
+| [Bathymetric-Adjustment-of-Rating-Curves-and-Stage-Shift-BARC-SS](https://github.com/Reizrb/Bathymetric-Adjustment-of-Rating-Curves-and-Stage-Shift-BARC-SS) | Adds the channel geometry to OWP HAND-FIM rating curves for flood mapping (BARC, BARC-SS) |
+| [TRoute-Channel-Geometry](https://github.com/Reizrb/TRoute-Channel-Geometry) | Adds the channel geometry to the NWM RouteLink file for T-Route routing (this repository) |
+| [T-Route](https://github.com/NOAA-OWP/t-route) | NOAA OWP's channel routing model for the National Water Model |
