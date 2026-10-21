@@ -1,5 +1,7 @@
 # T-Route Channel Geometry
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23520058.svg)](https://doi.org/10.5281/zenodo.23520058)
+
 Python code to update the channel geometry that
 [T-Route](https://github.com/NOAA-OWP/t-route), the routing model of the National Water
 Model (NWM), uses for every river reach.
